@@ -17,7 +17,7 @@ def test_count_of_news_and_right_order(client, many_news_and_comments):
     sorted_dates_news = sorted(all_date_news, reverse=True)
     object_list_comments = many_news_and_comments.comment_set.all()
     all_date_comments = [comment.created for comment in object_list_comments]
-    sorted_dates_comments = sorted(all_date_comments, reverse=True)
+    sorted_dates_comments = sorted(all_date_comments)
     assert (response.context[
         'object_list'].count() <= settings.NEWS_COUNT_ON_HOME_PAGE)
     assert all_date_news == sorted_dates_news
