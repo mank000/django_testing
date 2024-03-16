@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from django.test.client import Client
 from django.conf import settings
+from django.utils import timezone
 
 from news.forms import BAD_WORDS
 from news.models import News, Comment
@@ -66,6 +67,7 @@ def comments(author_client, author):
 
 @pytest.fixture
 def many_news_and_comments(author_client, author):
+    now = timezone.now()
     news = [
         News.objects.create(
             title=f'заголовок {i}',
@@ -76,7 +78,7 @@ def many_news_and_comments(author_client, author):
         news=news[0],
         text=f'text{i}',
         author=author,
-        created=datetime.now() + timedelta(days=i)
+        created=now + timedelta(days=i)
     ) for i in range(4)]
     return news[0]
 
