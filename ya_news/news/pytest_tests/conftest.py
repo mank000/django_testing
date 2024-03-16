@@ -67,7 +67,6 @@ def comments(author_client, author):
 
 @pytest.fixture
 def many_news_and_comments(author_client, author):
-    now = timezone.now()
     news = [
         News.objects.create(
             title=f'заголовок {i}',
@@ -78,7 +77,7 @@ def many_news_and_comments(author_client, author):
         news=news[0],
         text=f'text{i}',
         author=author,
-        created=now + timedelta(days=i)
+        created=timezone.now() + timedelta(days=i)
     ) for i in range(4)]
     return news[0]
 
