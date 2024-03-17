@@ -4,8 +4,8 @@ import pytest
 from django.test.client import Client
 from django.conf import settings
 from django.utils import timezone
+from django.urls import reverse
 
-from news.forms import BAD_WORDS
 from news.models import News, Comment
 
 
@@ -34,7 +34,7 @@ def not_author_client(not_author):
 
 
 @pytest.fixture
-def news(author_client):
+def news():
     news = News.objects.create(
         title='Заголовок',
         text='Текст новости',
@@ -43,20 +43,7 @@ def news(author_client):
 
 
 @pytest.fixture
-def get_news_id(author_client):
-    news = News.objects.create(
-        title='Заголовок',
-        text='Текст новости',
-    )
-    return (news.id, )
-
-
-@pytest.fixture
-def comments(author_client, author):
-    news = News.objects.create(
-        title='Заголовок',
-        text='Текст новости',
-    )
+def comments(author, news):
     comment = Comment.objects.create(
         news=news,
         text='lajsdk',
@@ -66,33 +53,38 @@ def comments(author_client, author):
 
 
 @pytest.fixture
-def many_news_and_comments(author_client, author):
+def many_news(author):
     news = [
-        News.objects.create(
+        News(
             title=f'заголовок {i}',
             text=f'текст {i}',
             date=datetime.today() - timedelta(days=i)
         ) for i in range(settings.NEWS_COUNT_ON_HOME_PAGE + 2)]
-    [Comment.objects.create(
-        news=news[0],
-        text=f'text{i}',
-        author=author,
-        created=timezone.now() + timedelta(days=i)
-    ) for i in range(4)]
+    News.objects.bulk_create(news)
+    for n in news:
+        n.save()
     return news[0]
 
 
 @pytest.fixture
-def form_data_for_comment(news, author):
-    return {'news': news,
-            'text': 'textdata',
-            'author': author,
-            }
+def many_comments(news, author):
+    now = timezone.now()
+    for i in range(11):
+        comment = Comment.objects.create(
+            news=news, author=author, text=f'text {i}',
+        )
+        comment.created = now + timedelta(days=i)
+        comment.save()
+    return news
 
 
 @pytest.fixture
-def form_data_for_comment_with_badwords(news, author):
-    return {'news': news,
-            'text': f'textdata {BAD_WORDS[1]}',
-            'author': author,
-            }
+def home_url():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def detail_url():
+    def _get_news_detail_url(num):
+        return reverse('news:detail', args=(num, ))
+    return _get_news_detail_url
