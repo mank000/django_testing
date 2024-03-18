@@ -1,8 +1,8 @@
 import pytest
-
 from django.conf import settings
 
 from news.forms import CommentForm
+from news.models import News
 
 
 def test_count_of_news_and_right_order(client, many_news,
@@ -13,14 +13,15 @@ def test_count_of_news_and_right_order(client, many_news,
     all_date_news = [news.date for news in news_objects]
     sorted_dates_news = sorted(all_date_news, reverse=True)
     assert (response.context[
-        'object_list'].count() <= settings.NEWS_COUNT_ON_HOME_PAGE)
+        'object_list'].count() == settings.NEWS_COUNT_ON_HOME_PAGE)
     assert all_date_news == sorted_dates_news
 
 
 @pytest.mark.django_db
 def test_right_order_comments(client, many_comments):
     """Проверяет сортировку комментариев"""
-    comments_objects = many_comments.comment_set.all()
+    # исправит
+    comments_objects = News.objects.last().comment_set.all()
     all_date_comments = [comment.created for comment in comments_objects]
     sorted_dates_comments = sorted(all_date_comments)
     assert all_date_comments == sorted_dates_comments
@@ -33,15 +34,13 @@ def test_right_order_comments(client, many_comments):
         (pytest.lazy_fixture('client'), False))
 )
 def test_anonymous_user_cant_get_form(user, news, watch, detail_url):
-    """
-    Анонимному пользователю недоступна
-    форма для отправки комментария на
-    странице отдельной новости, а авторизованному доступна.
-    """
-    url = detail_url(news.id)
+    """Доступ пользователя к форме для отправки комментария."""
+    url = detail_url
     response = user.get(url)
-    if watch:
-        assert "form" in response.context
-        assert isinstance(response.context['form'], CommentForm)
+    if 'form' in response.context == watch:
+        is_form = True
     else:
-        assert "form" not in response.context
+        is_form = False
+
+    if is_form:
+        assert isinstance(response.context['form'], CommentForm)

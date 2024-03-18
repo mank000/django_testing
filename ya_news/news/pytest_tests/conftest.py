@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
 import pytest
-from django.test.client import Client
 from django.conf import settings
+from django.test.client import Client
 from django.utils import timezone
 from django.urls import reverse
 
-from news.models import News, Comment
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -61,9 +61,6 @@ def many_news(author):
             date=datetime.today() - timedelta(days=i)
         ) for i in range(settings.NEWS_COUNT_ON_HOME_PAGE + 2)]
     News.objects.bulk_create(news)
-    for n in news:
-        n.save()
-    return news[0]
 
 
 @pytest.fixture
@@ -75,7 +72,6 @@ def many_comments(news, author):
         )
         comment.created = now + timedelta(days=i)
         comment.save()
-    return news
 
 
 @pytest.fixture
@@ -84,7 +80,30 @@ def home_url():
 
 
 @pytest.fixture
-def detail_url():
-    def _get_news_detail_url(num):
-        return reverse('news:detail', args=(num, ))
-    return _get_news_detail_url
+def detail_url(news):
+    return reverse('news:detail', args=(news.id, ))
+
+
+@pytest.fixture
+def edit_url(comments):
+    return reverse('news:edit', args=(comments.id, ))
+
+
+@pytest.fixture
+def delete_url(comments):
+    return reverse('news:delete', args=(comments.id, ))
+
+
+@pytest.fixture
+def logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def signup_url():
+    return reverse('users:signup')

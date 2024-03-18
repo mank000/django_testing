@@ -27,13 +27,10 @@ class TestContent(TestCase):
                                        author=cls.author)
 
     def test_object_list_on_context(self):
-        """
-        Отдельная заметка передаётся
-        на страницу со списком заметок в списке.
-        """
+        """Отдельная заметка передается в списке."""
         response = self.client_author.get(self.notes_list)
         self.assertIn('note_list', response.context)
-        self.assertIsNotNone(response.context['note_list'])
+        self.assertIn(self.note, response.context['note_list'])
 
     def test_notes_for_one_user(self):
         """
@@ -41,7 +38,7 @@ class TestContent(TestCase):
         не попадают заметки другого пользователя.
         """
         response = self.client_reader.get(self.notes_list)
-        self.assertEqual(len(list(response.context.get('note_list'))), 0)
+        self.assertNotIn(self.note, response.context['note_list'])
 
     def test_forms_on_add_edit(self):
         """
