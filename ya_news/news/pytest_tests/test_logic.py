@@ -35,32 +35,6 @@ def test_ban_words(not_author_client, news, detail_url):
     assert before_comments == after_comments
 
 
-# @pytest.mark.parametrize(
-#     'user, answer', (
-#         (pytest.lazy_fixture('author_client'), HTTPStatus.NOT_FOUND),
-#         (pytest.lazy_fixture('not_author_client'), HTTPStatus.OK)
-#     )
-# )
-# @pytest.mark.parametrize(
-#     'name, ,status',
-#     ((pytest.lazy_fixture('edit_url'), HTTPStatus.OK),
-#      pytest.lazy_fixture('delete_url'), HTTPStatus.OK),
-# )
-# def test_auth_user_permissions(user, status, answer, name, comments):
-#     """Изменение и удаление своих или чужих комментариев."""
-#     url = name
-#     before = comments.news.comment_set.all().count()
-#     text_before = comments.text
-#     response = user.post(url, data={'text': 'not'})
-#     if 'edit' in name:
-#         assert comments.text == text_before
-#     elif name == 'news:delete':
-#         after = comments.news.comment_set.all().count()
-#         if answer == 404:
-#             assert before > after
-#         else:
-#             assert before == after
-#     assert response.status_code != status
 @pytest.mark.parametrize(
     'user, answer', (
         (pytest.lazy_fixture('author_client'), 1),

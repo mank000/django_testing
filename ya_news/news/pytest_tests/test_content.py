@@ -20,7 +20,6 @@ def test_count_of_news_and_right_order(client, many_news,
 @pytest.mark.django_db
 def test_right_order_comments(client, many_comments):
     """Проверяет сортировку комментариев"""
-    # исправит
     comments_objects = News.objects.last().comment_set.all()
     all_date_comments = [comment.created for comment in comments_objects]
     sorted_dates_comments = sorted(all_date_comments)

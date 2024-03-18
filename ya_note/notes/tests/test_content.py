@@ -33,18 +33,12 @@ class TestContent(TestCase):
         self.assertIn(self.note, response.context['note_list'])
 
     def test_notes_for_one_user(self):
-        """
-        В список заметок одного пользователя
-        не попадают заметки другого пользователя.
-        """
+        """Не попадают заметки другого пользователя."""
         response = self.client_reader.get(self.notes_list)
         self.assertNotIn(self.note, response.context['note_list'])
 
     def test_forms_on_add_edit(self):
-        """
-        На страницы создания и
-        редактирования заметки передаются формы.
-        """
+        """Формы на редактирование."""
         for name, args in (('notes:edit', (self.note.slug, )),
                            ('notes:add', None)):
             with self.subTest(name=name):

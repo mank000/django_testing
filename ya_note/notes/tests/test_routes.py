@@ -72,10 +72,7 @@ class TestRoutes(TestCase):
                 self.assertRedirects(response, redirect_url)
 
     def test_user_login_logout_signup(self):
-        """
-        Страницы регистрации пользователей, входа в учётную запись
-        и выхода из неё доступны всем пользователям.
-        """
+        """Страницы аутентификации."""
         for name in ('users:login',
                      'users:logout',
                      'users:signup'):
