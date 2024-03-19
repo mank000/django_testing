@@ -13,27 +13,13 @@ NOT_FOUND_STATUS = HTTPStatus.NOT_FOUND
 @pytest.mark.parametrize(
     'name, user, status',
     (
-        (lf('home_url'),
-         lf('client'),
-         OK_STATUS),
-        (lf('detail_url'),
-         lf('client'),
-         OK_STATUS),
-        (lf('edit_url'),
-         lf('not_author_client'),
-         NOT_FOUND_STATUS),
-        (lf('delete_url'),
-         lf('not_author_client'),
-         NOT_FOUND_STATUS),
-        (lf('logout_url'),
-         lf('client'),
-         OK_STATUS),
-        (lf('login_url'),
-         lf('client'),
-         OK_STATUS),
-        (lf('signup_url'),
-         lf('client'),
-         OK_STATUS)
+        (lf('home_url'), lf('client'), OK_STATUS),
+        (lf('detail_url'), lf('client'), OK_STATUS),
+        (lf('edit_url'), lf('not_author_client'), NOT_FOUND_STATUS),
+        (lf('delete_url'), lf('not_author_client'), NOT_FOUND_STATUS),
+        (lf('logout_url'), lf('client'), OK_STATUS),
+        (lf('login_url'), lf('client'), OK_STATUS),
+        (lf('signup_url'), lf('client'), OK_STATUS)
     )
 )
 def test_home_page_avaiblity_for_user(user, name, status):

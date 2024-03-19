@@ -1,9 +1,11 @@
 from random import choice
 
-from pytest_django.asserts import assertFormError
 import pytest
+from django.contrib.auth import get_user
+from pytest_django.asserts import assertFormError
 
 from news.forms import BAD_WORDS, WARNING
+from news.models import Comment
 
 
 @pytest.mark.django_db
@@ -15,13 +17,16 @@ from news.forms import BAD_WORDS, WARNING
 )
 def test_anonymous_cant_send_comment(user, news, detail_url, increase):
     """Отправка комментария пользователем."""
+    DATA_TEXT = 'text1'
     url = detail_url
     before_user_post = news.comment_set.all().count()
-    user.post(url, data={'text': 'text1'})
+    user.post(url, data={'text': DATA_TEXT})
     after_user_post = news.comment_set.all().count()
-    assert before_user_post + increase <= after_user_post
-    if increase == 1:
-        assert news.comment_set.last().text == 'text1'
+    assert before_user_post + increase == after_user_post
+    if increase:
+        assert news.comment_set.last().text == DATA_TEXT
+        assert news.comment_set.last().author == get_user(user)
+        assert news.comment_set.last().news == news
 
 
 def test_ban_words(not_author_client, news, detail_url):
@@ -42,14 +47,15 @@ def test_ban_words(not_author_client, news, detail_url):
     )
 )
 def test_author_edit_comment(user, answer, comments, edit_url):
-    before_text = comments.text
+    before_comment = Comment.objects.get(id=comments.id)
     user.post(edit_url, data={'text': 'not'})
-    comments.refresh_from_db()
-    after_text = comments.text
+    after_comment = Comment.objects.get(id=comments.id)
     if answer:
-        assert before_text != after_text
+        assert before_comment.text != after_comment.text
     else:
-        assert before_text == after_text
+        assert before_comment.text == after_comment.text
+    assert before_comment.author == after_comment.author
+    assert before_comment.news == after_comment.news
 
 
 @pytest.mark.parametrize(

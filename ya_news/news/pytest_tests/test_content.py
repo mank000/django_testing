@@ -36,10 +36,6 @@ def test_anonymous_user_cant_get_form(user, news, watch, detail_url):
     """Доступ пользователя к форме для отправки комментария."""
     url = detail_url
     response = user.get(url)
-    if 'form' in response.context == watch:
-        is_form = True
-    else:
-        is_form = False
-
-    if is_form:
+    assert ('form' in response.context) is watch
+    if watch:
         assert isinstance(response.context['form'], CommentForm)
